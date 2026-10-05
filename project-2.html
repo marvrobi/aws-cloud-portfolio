@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project #2 | AWS WordPress / Cloud Infrastructure Lab</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:#0f0f13; color:#e2e2e9; line-height:1.7; }
+    a { color:#b4a9ff; text-underline-offset:4px; }
+    a:focus-visible { outline:2px solid #4ecdc4; outline-offset:5px; }
+    nav { padding:1rem 2rem; border-bottom:1px solid #2a2a35; }
+    nav a { font-weight:600; }
+    header { padding:4rem 2rem 3rem; background:radial-gradient(ellipse at 50% 0%,#1e1a3a 0%,#0f0f13 75%); }
+    .wrap { max-width:1000px; margin:0 auto; }
+    .eyebrow { color:#4ecdc4; font-size:.85rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    h1 { font-size:clamp(2rem,5vw,3.2rem); line-height:1.2; letter-spacing:-1px; }
+    h2 { font-size:1.65rem; margin-top:0; }
+    h3 { font-size:1.1rem; }
+    p,li { color:#b7b7ca; }
+    .lead { max-width:760px; font-size:1.1rem; }
+    .tags { display:flex; flex-wrap:wrap; gap:.4rem; }
+    .tag { background:#252535; color:#c0bce0; font-size:.8rem; padding:.2rem .6rem; border-radius:4px; }
+    main { padding:0 2rem 3rem; }
+    section { margin:2rem 0; padding:1.8rem; border:1px solid #2a2a3a; border-radius:12px; background:#1a1a26; }
+    .notice { border-left:4px solid #4ecdc4; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.5rem; }
+    code { color:#d7d0ff; overflow-wrap:anywhere; }
+    figure { margin:1.5rem 0 0; }
+    img { width:100%; height:auto; border-radius:8px; display:block; }
+    figcaption { color:#b7b7ca; font-size:.9rem; margin-top:1rem; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; text-align:left; }
+    th,td { padding:.8rem; border-bottom:1px solid #363648; vertical-align:top; }
+    td { color:#b7b7ca; }
+    footer { text-align:center; padding:2rem; border-top:1px solid #2a2a35; color:#a0a0b0; }
+    @media(max-width:600px) { .grid { grid-template-columns:1fr; } main,header,nav { padding-left:1rem; padding-right:1rem; } section { padding:1.1rem; } }
+  </style>
+</head>
+<body>
+  <nav><div class="wrap"><a href="index.html#projects">&larr; Back to Marvin's Portfolio</a></div></nav>
+  <header><div class="wrap">
+    <p class="eyebrow">Project #2 &middot; Complete &middot; September 30, 2026</p>
+    <h1>AWS WordPress /<br />Cloud Infrastructure Lab</h1>
+    <p class="lead">A working WordPress lab, a tested manual recovery path, and secure static content delivery. Built to connect AWS architecture concepts with configuration, validation, and operational decisions.</p>
+    <div class="tags"><span class="tag">Lightsail</span><span class="tag">WordPress</span><span class="tag">Static IP</span><span class="tag">CloudWatch</span><span class="tag">S3</span><span class="tag">CloudFront</span><span class="tag">Backup &amp; Recovery</span></div>
+  </div></header>
+  <main class="wrap">
+    <section class="notice"><h2>Result and scope</h2><p>WordPress was restored from a snapshot to a replacement Lightsail instance, and availability was verified after manually moving the original Static IP. A separate private S3 + CloudFront delivery path was validated with HTTPS, an HTTP-to-HTTPS redirect, and a confirmed cache hit.</p><p><strong>This learning lab demonstrates manual recovery. Automatic Multi-AZ failover, continuous replication, and zero-downtime recovery were not demonstrated.</strong> It is portfolio evidence of hands-on lab work, not production client experience.</p></section>
+    <section><h2>Problem and architecture decisions</h2><p>The objective was to explore a small-business WordPress hosting scenario with a stable endpoint, basic monitoring, and a practical recovery process. Lightsail provided a simplified, bundled hosting model; the lab instance used 1 GB RAM, 2 vCPUs, and 40 GB SSD. A Static IP kept the public endpoint consistent when switching instances.</p><div class="grid"><div><h3>WordPress workload</h3><p>Internet &rarr; Static IP &rarr; Lightsail WordPress. CPU monitoring and a baseline snapshot supported operations and recovery testing.</p></div><div><h3>Separate content delivery lab</h3><p>Browser &rarr; CloudFront over HTTPS &rarr; private S3 origin. This was a separate static-content path, not evidence that CloudFront fronted the WordPress application.</p></div></div><figure><a href="project-2-aws-architecture.svg"><img src="project-2-aws-architecture.png" alt="Two separate paths: HTTPS through CloudFront to private S3, and Static IP to Lightsail WordPress with a CPU alarm. Manual recovery proceeds from snapshot to replacement instance, validation, IP reassignment, and service verification." width="1800" height="1320" /></a><figcaption>Original completed Project #2 diagram. Its footer reflects the source context available when created; the alarm settings and proposed recovery targets below are verified from the final Notion documentation. <a href="project-2-aws-architecture.svg">Open scalable SVG</a> &middot; <a href="project-2-aws-architecture.png">Open PNG</a>.</figcaption></figure></section>
+    <section><h2>Implementation and validation</h2><div class="table-wrap"><table><thead><tr><th scope="col">Area</th><th scope="col">Completed work and evidence</th></tr></thead><tbody>
+      <tr><th scope="row">Deployment</th><td>Deployed and verified WordPress on <code>aws-wordpress-lab</code>; attached a Static IP and reviewed Lightsail firewall/network access.</td></tr>
+      <tr><th scope="row">Monitoring</th><td>Configured and reviewed a CloudWatch CPU utilization alarm at &ge;80%, for two occurrences within 20 minutes. The documentation confirms configuration and review, not a tested notification or automated remediation.</td></tr>
+      <tr><th scope="row">Recovery</th><td>Created <code>aws-wordpress-lab-baseline</code>, restored it to <code>aws-wordpress-lab-recovery</code>, verified the restored workload, moved the original Static IP, and verified WordPress through the same endpoint.</td></tr>
+      <tr><th scope="row">Private origin</th><td>Used a dedicated private S3 bucket with Block Public Access and private origin access for CloudFront. SSE-S3 encryption at rest was documented.</td></tr>
+      <tr><th scope="row">HTTPS and caching</th><td>Configured <code>index.html</code> as CloudFront's default root object. Validated HTTPS delivery, HTTP&rarr;HTTPS redirect, and <code>X-Cache: Hit from cloudfront</code>.</td></tr>
+      <tr><th scope="row">Networking review</th><td>Inspected VPC, subnets, route table, Internet Gateway, Security Groups, and Network ACLs read-only. Reviewed public/private subnet and NAT concepts; this was not a new custom VPC deployment.</td></tr>
+      <tr><th scope="row">Cleanup</th><td>Returned the Static IP to the original instance and deleted the temporary recovery instance after validation; retained the baseline snapshot.</td></tr>
+    </tbody></table></div></section>
+    <section><h2>Tested manual recovery workflow</h2><ol><li>Create a baseline snapshot of the WordPress instance.</li><li>Restore the snapshot to a replacement Lightsail instance.</li><li>Verify the restored WordPress workload.</li><li>Manually reassign the original Static IP to the replacement.</li><li>Verify WordPress availability through the same public endpoint.</li><li>For lab cleanup, return the Static IP to the original instance and delete the temporary replacement.</li></ol><p><strong>Lesson:</strong> A snapshot supplies a recovery source; the restore test proves that the workload can run again. Reassigning the Static IP preserves the endpoint, but the workflow still requires an operator and may involve downtime.</p></section>
+    <section><h2>Recovery planning: targets, not measured guarantees</h2><p>Documented a proposed <strong>24-hour RPO</strong> (acceptable data-loss window) and <strong>4-hour RTO</strong> (target time to restore service), with at-least-daily backups, 14-day retention, and validation of the WordPress database and uploaded files.</p><p>These are planning targets. The lab does not establish measured recovery times, production guarantees, or an implemented daily backup schedule and retention policy.</p></section>
+    <section><h2>Security, performance, and cost lessons</h2><ul><li><strong>Private content delivery:</strong> Block Public Access and private-origin access restrict direct public S3 exposure while CloudFront delivers content.</li><li><strong>Encryption:</strong> SSE-S3 covers S3-managed encryption at rest. SSE-KMS key control, permissions, and auditability were studied; a deployed or tested SSE-KMS workflow is not claimed.</li><li><strong>HTTPS and caching:</strong> HTTPS protects the validated content-delivery path in transit. A real CloudFront cache hit supplied concrete caching evidence; performance benchmarking was not recorded.</li><li><strong>Monitoring:</strong> A CPU alarm provides an operational signal. It does not itself restore a failed application or establish complete application-health coverage.</li><li><strong>Cost awareness:</strong> Removing the temporary recovery instance avoided unnecessary ongoing instance charges. Budgets and Cost Explorer concepts were reviewed; quantified savings and deployed budget alerts are not claimed.</li><li><strong>Resilience:</strong> The tested snapshot path improves recoverability, while a single running WordPress instance remains a point of failure.</li></ul></section>
+    <section><h2>Business value and production considerations</h2><p>This lab illustrates how a small website could gain a stable endpoint, basic monitoring, and a documented recovery process. It strengthened my ability to explain hosting and recovery tradeoffs in plain language.</p><p>A production design would need requirements and further implementation and testing for backup automation, recovery timing, application-health monitoring, access controls, patching, and any required high availability. Automatic Multi-AZ failover and zero-downtime recovery remain outside this project's demonstrated scope.</p></section>
+    <section><h2>Skills demonstrated</h2><ul><li>Deployed and validated WordPress on AWS Lightsail with a Static IP and CPU monitoring.</li><li>Tested snapshot-based manual recovery by restoring a replacement instance, reassigning the endpoint, and verifying application availability.</li><li>Validated a private S3 + CloudFront delivery path with HTTPS, HTTP-to-HTTPS redirect, and cache-hit evidence.</li><li>Documented architecture, recovery targets, security decisions, cost lessons, and the boundaries of the lab.</li></ul><p><small>Evidence basis: completed Project #2 portfolio documentation and dated validation entries in the AWS 90-Day Planner in Notion. Configuration and test results above are recorded lab evidence; this page does not assert that lab endpoints are currently live.</small></p></section>
+  </main>
+  <footer>Marvin Robinson &middot; AWS Cloud &amp; IT Portfolio &middot; <a href="index.html#projects">All projects</a></footer>
+</body>
+</html>
